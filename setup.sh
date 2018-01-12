@@ -5,10 +5,14 @@ reset=`tput sgr0`
 
 clear
 
+# Checking for root
+
 if [ "$(id -u)" != "0" ]; then
 	echo "Please rerun as root."
 	exit 1
 fi
+
+# Installing Application Dependencies
 
 declare -A myArray
 myArray=([MariaDB]=mariadb-server [NGINX]=nginx [ClamAV]=clamav [ClamAV-Daemon]=clamav-daemon)
@@ -19,9 +23,9 @@ do
 	if [ $(dpkg-query -W -f='${Status}' ${myArray[$index]} 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
 	  echo "${green}Installing $index...${reset}"
 	  apt-get -qq install ${myArray[$index]}
-	  
+
 	  clear
-	  
+
 	  if [ $index = "MariaDB" ]; then
 		echo "${green}Configuring MariaDB...${reset}"
 
@@ -32,28 +36,28 @@ do
 		mysql -e "CREATE USER ${MAINDB}@localhost IDENTIFIED BY '${PASSWDDB}';"
 		mysql -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"
 		mysql -e "FLUSH PRIVILEGES;"
-		
+
 		clear
 	  fi
-	  
+
 	else
 	  echo "${green}$index already installed${reset}"
 	fi
 done
 
-the_ppa=ondrej/php
+# Adding PPA for PHP 7.1
 
-if ! grep -q "^deb .*$the_ppa" /etc/apt/sources.list /etc/apt/sources.list.d/* &> /dev/null; then
+if ! grep -q "^deb .*ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d/* &> /dev/null; then
 
     echo "${green}Adding Ondrej PPA...${reset}"
 	sudo add-apt-repository -y ppa:ondrej/php -y
-	
-	if ! grep -q "^deb .*$the_ppa" /etc/apt/sources.list /etc/apt/sources.list.d/* &> /dev/null; then
+
+	if ! grep -q "^deb .*ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d/* &> /dev/null; then
 		exit 1
 	fi
-	
+
 	clear
-	
+
 	echo "${green}Updating and Upgrading Packages...${reset}"
 
 	apt update && sudo apt upgrade -y
@@ -63,6 +67,8 @@ else
 	echo "${green}Ondrej PPA already added.${reset}"
 fi
 
+
+# Installing PHP 7.1 and Extensions
 
 declare -A php
 php=([PHP:7.1-FPM]=php7.1-fpm [PHP:7.1-XML]=php7.1-xml [PHP:7.1-MBSTRING]=php7.1-mbstring [PHP:7.1-ZIP]=php7.1-zip [PHP:7.1-MYSQL]=php7.1-mysql [PHP:7.1-LDAP]=php7.1-ldap [PHP:7.1-CURL]=php7.1-curl)
@@ -78,18 +84,24 @@ do
 	  echo "${green}$index already installed${reset}"
 	fi
 done
-	
+
+# Composer Install
+
 echo "${green}Installing Composer...${reset}"
 
 curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 
 clear
 
+# Git repository
+
 echo "${green}Cloning Git Repository...${reset}"
 
 git clone https://github.com/kunli0/Stratus.git /var/www/Stratus
 
 clear
+
+# Folder Permissions
 
 echo "${green}Setting up Folder Permissions...${reset}"
 
@@ -101,6 +113,8 @@ find /var/www/Stratus -type d -exec chmod 755 {} \;
 
 clear
 
+# Package Dependencies
+
 echo "${green}Installing Dependencies...${reset}"
 
 cd /var/www/Stratus
@@ -108,6 +122,8 @@ cd /var/www/Stratus
 sudo -u www-data composer install
 
 clear
+
+# Laravel Setup
 
 echo "${green}Configuring Laravel...${reset}"
 
@@ -122,6 +138,8 @@ php artisan key:generate
 sudo -u www-data php artisan migrate --seed
 
 clear
+
+# NGINX Setup
 
 echo "${green}Configuring NGINX Sites...${reset}"
 
