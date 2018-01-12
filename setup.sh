@@ -93,9 +93,11 @@ clear
 
 echo "${green}Setting up Folder Permissions...${reset}"
 
-chown -R 33:1000 /var/www/Stratus
+chown -R www-data:www-data /var/www/Stratus
 
-chmod -R 775 /var/www/Stratus
+find /var/www/Stratus -type f -exec chmod 644 {} \;
+
+find /var/www/Stratus -type d -exec chmod 755 {} \;
 
 clear
 
