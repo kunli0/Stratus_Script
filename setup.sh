@@ -129,9 +129,9 @@ echo "${green}Configuring Laravel...${reset}"
 
 cp .env.example .env
 
-chown 33:1000 /var/www/Stratus/.env
+chown www-data:www-data /var/www/Stratus/.env
 
-chmod 775 /var/www/Stratus/.env
+chmod 644 /var/www/Stratus/.env
 
 php artisan key:generate
 
