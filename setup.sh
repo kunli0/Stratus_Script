@@ -97,7 +97,7 @@ clear
 
 echo "${green}Cloning Git Repository...${reset}"
 
-git clone https://github.com/kunli0/Stratus.git /var/www/Stratus
+git clone https://github.com/kunli0/stratus.git /var/www/stratus
 
 clear
 
@@ -105,11 +105,11 @@ clear
 
 echo "${green}Setting up Folder Permissions...${reset}"
 
-chown -R www-data:www-data /var/www/Stratus
+chown -R www-data:www-data /var/www/stratus
 
-find /var/www/Stratus -type f -exec chmod 644 {} \;
+find /var/www/stratus -type f -exec chmod 644 {} \;
 
-find /var/www/Stratus -type d -exec chmod 755 {} \;
+find /var/www/stratus -type d -exec chmod 755 {} \;
 
 clear
 
@@ -117,7 +117,7 @@ clear
 
 echo "${green}Installing Dependencies...${reset}"
 
-cd /var/www/Stratus
+cd /var/www/stratus
 
 sudo -u www-data composer install
 
@@ -129,9 +129,9 @@ echo "${green}Configuring Laravel...${reset}"
 
 cp .env.example .env
 
-chown www-data:www-data /var/www/Stratus/.env
+chown www-data:www-data /var/www/stratus/.env
 
-chmod 644 /var/www/Stratus/.env
+chmod 644 /var/www/stratus/.env
 
 php artisan key:generate
 
@@ -148,7 +148,7 @@ server {
     listen 80 default_server;
     listen [::]:80 default_server;
 
-    root /var/www/Stratus/public;
+    root /var/www/stratus/public;
     index index.php index.html index.htm;
 
     server_name _;
